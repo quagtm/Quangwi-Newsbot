@@ -3,6 +3,7 @@ import google.generativeai as genai
 import feedparser
 import re
 import urllib.request
+import io
 
 # --- HÀM LỌC NỘI DUNG SIÊU SẠCH ---
 def clean_content(raw_html):
@@ -14,13 +15,24 @@ def clean_content(raw_html):
     clean = clean.replace('&nbsp;', ' ').strip()
     return clean
 
-# --- HÀM LẤY TIN NÂNG CAO ---
+# --- HÀM LẤY TIN NÂNG CAO (ĐÃ TỐI ƯU CHO VIETSTOCK) ---
 def get_rss_feed(url):
     try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req) as response:
-            return feedparser.parse(response.read())
+        # Sử dụng Header đầy đủ hơn để tránh bị chặn
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Connection': 'keep-alive',
+        }
+        req = urllib.request.Request(url, headers=headers)
+        
+        with urllib.request.urlopen(req, timeout=15) as response:
+            content = response.read()
+            # Vietstock đôi khi trả về định dạng nén hoặc mã hóa lạ, dùng io.BytesIO để bọc lại
+            return feedparser.parse(io.BytesIO(content))
     except Exception as e:
+        st.sidebar.error(f"Lỗi kết nối {url.split('/')[2]}: {e}")
         return None
 
 # --- CẤU HÌNH GIAO DIỆN ---
@@ -65,7 +77,7 @@ if feed and feed.entries:
             if summary_key not in st.session_state:
                 with st.spinner("AI đang đọc bản tin..."):
                     try:
-                        sum_prompt = f"Hãy tóm tắt chi tiết các ý chính và số liệu quan trọng của bản tin sau: {entry.title}. Nội dung: {raw_summary}"
+                        sum_prompt = f"Hãy tóm tắt chi tiết các ý chính và số liệu quan trọng của bản tin sau khoảng 100-150 từ: {entry.title}. Nội dung: {raw_summary}"
                         summary_res = model.generate_content(sum_prompt)
                         st.session_state[summary_key] = summary_res.text
                     except:
