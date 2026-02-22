@@ -31,7 +31,11 @@ st.title("🕵️ Bot Tổng hợp & Phân tích Tin tức Chứng khoán")
 
 # --- CẤU HÌNH API KEY ---
 st.sidebar.title("Cấu hình Bot")
-api_key = st.sidebar.text_input("Nhập Gemini API Key:", value="AIzaSyACcDJhTJYtBL0qJDi18USfM9NO0MbYPH0", type="password")
+# Thay vì nhập input, Bot sẽ lấy từ cấu hình bảo mật của Streamlit Cloud
+if "GEMINI_API_KEY" in st.secrets:
+    api_key = st.secrets["GEMINI_API_KEY"]
+else:
+    api_key = st.sidebar.text_input("Nhập Gemini API Key:", type="password")
 
 # --- DANH SÁCH NGUỒN TIN ---
 SOURCES = {
