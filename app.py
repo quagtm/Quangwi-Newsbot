@@ -30,15 +30,12 @@ st.set_page_config(page_title="Stock AI Assistant", layout="wide")
 st.title("🕵️ Bot Tổng hợp & Phân tích Tin tức Chứng khoán")
 
 # --- CẤU HÌNH API KEY ---
-st.sidebar.title("Cấu hình Bot")
-# Thay vì nhập input, Bot sẽ lấy từ cấu hình bảo mật của Streamlit Cloud
-# Kiểm tra xem API Key đã được cài đặt trong Secrets (online) chưa
 if "GEMINI_API_KEY" in st.secrets:
-    api_key = st.secrets["GEMINI_API_KEY"]
-    st.sidebar.success("✅ Đã kết nối API Key bảo mật")
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    model = genai.GenerativeModel('models/gemini-2.5-flash')
 else:
-    # Nếu chưa có online (chạy localhost), mới hiện ô nhập để bạn dán vào
-    api_key = st.sidebar.text_input("Nhập Gemini API Key:", type="password", help="Dán Key của bạn vào đây nếu chạy cục bộ")
+    st.error("Chưa cấu hình API Key trong Secrets!")
+    st.stop()
 
 # --- DANH SÁCH NGUỒN TIN ---
 SOURCES = {
