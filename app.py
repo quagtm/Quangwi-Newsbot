@@ -77,11 +77,23 @@ if feed and feed.entries:
             if summary_key not in st.session_state:
                 with st.spinner("AI đang đọc bản tin..."):
                     try:
-                        sum_prompt = f"Hãy tóm tắt chi tiết đầy đủ các ý chính và số liệu quan trọng của bản tin sau khoảng 100-150 từ: {entry.title}. Nội dung: {raw_summary}"
+                        # PROMPT ĐÃ CẢI TIẾN: Yêu cầu AI khái quát và chi tiết hơn
+                        sum_prompt = f"""
+                        Bạn là một biên tập viên tài chính cao cấp. Hãy tóm tắt bản tin sau một cách chuyên nghiệp.
+                        Tiêu đề: {entry.title}
+                        Nội dung gốc: {raw_summary}
+
+                        Yêu cầu tóm tắt:
+                        1. Khái quát chủ đề chính của bản tin trong 1 câu đầu tiên.
+                        2. Trình bày chi tiết các luận điểm chính dưới dạng danh sách (bullet points).
+                        3. Đặc biệt chú trọng vào các con số, mốc thời gian và sự kiện then chốt.
+                        4. Độ dài khoảng 100-150 từ, hành văn súc tích, khách quan.
+                        """
                         summary_res = model.generate_content(sum_prompt)
                         st.session_state[summary_key] = summary_res.text
                     except:
-                        st.session_state[summary_key] = raw_summary
+                        # Nếu AI lỗi, vẫn hiện nội dung gốc để người dùng đọc
+                        st.session_state[summary_key] = f"*(Không thể tóm tắt tự động)* \n\n {raw_summary}"
 
             st.write(st.session_state[summary_key])
             st.write(f"[🔗 Đọc tin gốc tại đây]({entry.link})")
