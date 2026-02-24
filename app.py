@@ -70,14 +70,14 @@ if feed and feed.entries:
         raw_summary = clean_content(entry.get('summary', entry.get('description', '')))
         
         with st.expander(f"📰 {entry.title}"):
-            st.markdown("### 📝 Tóm tắt chi tiết từ AI:")
+            st.markdown("### 📝 Tóm tắt chi tiết bài viết:")
             
             # Sử dụng session_state để lưu tóm tắt, tránh load lại khi nhấn nút khác
             summary_key = f"sum_{selected_source}_{i}"
             if summary_key not in st.session_state:
                 with st.spinner("AI đang đọc bản tin..."):
                     try:
-                        sum_prompt = f"Hãy tóm tắt chi tiết các ý chính và số liệu quan trọng của bản tin sau khoảng 100-150 từ: {entry.title}. Nội dung: {raw_summary}"
+                        sum_prompt = f"Hãy tóm tắt chi tiết đầy đủ các ý chính và số liệu quan trọng của bản tin sau khoảng 100-150 từ: {entry.title}. Nội dung: {raw_summary}"
                         summary_res = model.generate_content(sum_prompt)
                         st.session_state[summary_key] = summary_res.text
                     except:
@@ -94,7 +94,7 @@ if feed and feed.entries:
                 Dựa trên tin tức: {entry.title}
                 Nội dung: {raw_summary}
                 
-                Hãy thực hiện đánh giá chuyên sâu cho nhà đầu tư chứng khoán Việt Nam:
+                Hãy thực hiện đánh giá chuyên sâu cho nhà đầu tư chứng khoán Việt Nam, viết dễ hiểu, không quá dài dòng:
                 1. **Đánh giá tác động:** (Tích cực/Tiêu cực/Trung lập) và mức độ ảnh hưởng (1-10).
                 2. **Phân tích mã cổ phiếu:** Liệt kê các mã/ngành bị ảnh hưởng và giải thích lý do.
                 3. **Chiến lược đề xuất:** Hành động cụ thể (Mua/Bán/Quan sát).
