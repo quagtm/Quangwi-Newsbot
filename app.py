@@ -44,7 +44,7 @@ st.title("🕵️ Bot Tổng hợp & Phân tích Tin tức Chứng khoán")
 if "GEMINI_API_KEY" in st.secrets:
     api_key = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('models/gemini-2.0-exp')
+    model = genai.GenerativeModel('models/gemini-2.5-pro')
 else:
     st.error("❌ Lỗi: Chưa cấu hình GEMINI_API_KEY trong phần Secrets của Streamlit!")
     st.stop()
